@@ -21,11 +21,22 @@ def create_app():
     from .routes.flashcard_routes import flashcard_bp
     from .routes.notes_routes import notes_bp
     from .routes.quiz_routes import quiz_bp
-    app.register_blueprint(auth_bp, url_prefix="/api/auth")
-    app.register_blueprint(chat_bp, url_prefix="/api")
-    app.register_blueprint(flashcard_bp, url_prefix="/api")
-    app.register_blueprint(notes_bp, url_prefix="/api")
-    app.register_blueprint(quiz_bp, url_prefix="/api")
+    from .routes.streak_routes import streak_bp
+    from .routes.learner_profiling_routes import learner_profiling_bp
+    from .routes.teacher_routes import teacher_bp
+    from .routes.feedback_routes import feedback_bp
+    from .routes.user_routes import user_bp
+
+    app.register_blueprint(auth_bp,              url_prefix="/api/auth")
+    app.register_blueprint(chat_bp,              url_prefix="/api")
+    app.register_blueprint(flashcard_bp,         url_prefix="/api")
+    app.register_blueprint(notes_bp,             url_prefix="/api")
+    app.register_blueprint(quiz_bp,              url_prefix="/api")
+    app.register_blueprint(streak_bp,            url_prefix="/api")
+    app.register_blueprint(learner_profiling_bp, url_prefix="/api/learner-profiling")
+    app.register_blueprint(teacher_bp,           url_prefix="/api")
+    app.register_blueprint(feedback_bp,          url_prefix="/api")
+    app.register_blueprint(user_bp,              url_prefix="/api")
 
     # Serve frontend pages
     @app.route("/")
