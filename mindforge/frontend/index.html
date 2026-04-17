@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MindForge — AI-Powered Learning</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/index.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav" id="mainNav">
+    <div class="nav-inner">
+
+      <!-- Logo -->
+      <a href="#" class="logo">
+        <div class="logo-avatar">⚡</div>
+        <span class="logo-text"><span class="logo-mind">Mind</span><span class="logo-forge">Forge</span></span>
+      </a>
+
+      <!-- Center links -->
+      <nav class="nav-links">
+        <a href="#features" class="nav-link active">Study Tools <span class="nav-caret">▾</span></a>
+        <a href="#how" class="nav-link">How it works</a>
+        <a href="#" class="nav-link">For Teachers</a>
+      </nav>
+
+      <!-- Search -->
+      <div class="nav-search">
+        <svg class="search-icon" viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5.5" stroke="#9ca3af" stroke-width="1.6"/><path d="M13.5 13.5L17 17" stroke="#9ca3af" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <input type="text" placeholder="Search anything..." />
+      </div>
+
+      <!-- Right actions -->
+      <div class="nav-right">
+
+        <!-- Bell -->
+        <button class="nav-icon-btn" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="notif-dot"></span>
+        </button>
+
+        <div class="nav-divider"></div>
+
+        <a href="signup.html" class="nav-create">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Create
+        </a>
+
+        <a href="login.html" class="btn-login">
+          Log in
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <!-- Mobile menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#features" class="nav-link">Study Tools</a>
+      <a href="#how" class="nav-link">How it works</a>
+      <a href="#" class="nav-link">For Teachers</a>
+      <div class="mobile-divider"></div>
+      <a href="signup.html" class="nav-create">＋ Create</a>
+      <a href="login.html" class="btn-login">Log in →</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge">✨ Personalized AI Learning for Every Student</div>
+      <h1 class="hero-title">How do you want to study?</h1>
+      <p class="hero-sub">MindForge adapts to your level, learning style, confidence, and study pace to create a smarter learning journey.</p>
+      <div class="hero-actions">
+        <a href="signup.html" class="btn-signup">Sign up for free</a>
+        <a href="signup.html?teacher=1" class="btn-teacher">I'm a teacher</a>
+      </div>
+      <p class="hero-trust">✓ Setup takes less than 30 seconds</p>
+
+      <!-- 4 Study Mode Cards -->
+      <div class="study-cards">
+
+        <div class="scard scard-blue">
+          <div class="scard-top">
+            <span class="scard-tag">Vocabulary</span>
+            <div class="scard-icon-wrap">📖</div>
+          </div>
+          <div class="scard-content">
+            <div class="scard-title">Learn</div>
+            <div class="scard-desc">Master new words with smart repetition</div>
+          </div>
+          <div class="scard-footer">
+            <span class="scard-stat">la pintura</span>
+            <span class="scard-arrow">→</span>
+          </div>
+          <div class="scard-bg-shape"></div>
+        </div>
+
+        <div class="scard scard-pink">
+          <div class="scard-top">
+            <span class="scard-tag">History</span>
+            <div class="scard-icon-wrap">📚</div>
+          </div>
+          <div class="scard-content">
+            <div class="scard-title">Study Guides</div>
+            <div class="scard-desc">Structured notes for every subject</div>
+          </div>
+          <div class="scard-footer">
+            <span class="scard-stat">Greek Art, Key Dates</span>
+            <span class="scard-arrow">→</span>
+          </div>
+          <div class="scard-bg-shape"></div>
+        </div>
+
+        <div class="scard scard-indigo">
+          <div class="scard-top">
+            <span class="scard-tag scard-tag-light">Biology</span>
+            <div class="scard-icon-wrap">🃏</div>
+          </div>
+          <div class="scard-content">
+            <div class="scard-title">Flashcards</div>
+            <div class="scard-desc">Flip, recall, and retain faster</div>
+          </div>
+          <div class="scard-footer">
+            <span class="scard-stat">superior vena cava</span>
+            <span class="scard-arrow">→</span>
+          </div>
+          <div class="scard-bg-shape"></div>
+        </div>
+
+        <div class="scard scard-peach">
+          <div class="scard-top">
+            <span class="scard-tag">Exam Prep</span>
+            <div class="scard-icon-wrap">📝</div>
+          </div>
+          <div class="scard-content">
+            <div class="scard-title">Practice Tests</div>
+            <div class="scard-desc">Simulate real exams, track your score</div>
+          </div>
+          <div class="scard-footer">
+            <span class="scard-stat">Score: 84% · 76/90 · 70m</span>
+            <span class="scard-arrow">→</span>
+          </div>
+          <div class="scard-bg-shape"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY CHOOSE -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2 class="section-title">Why Choose MindForge?</h2>
+        <p class="section-sub">From AI-generated study sets to streak tracking — every tool a modern learner needs.</p>
+      </div>
+
+      <!-- Carousel wrapper -->
+      <div class="fc-carousel-wrap">
+        <button class="fc-nav fc-nav-prev" id="fcPrev" aria-label="Previous">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+
+        <div class="fc-carousel" id="fcCarousel">
+          <div class="fc-track" id="fcTrack">
+
+            <div class="feature-card fc-blue">
+              <div class="fc-icon-circle" style="--c:#dbeafe;--s:#3b82f6">🧠</div>
+              <h3>AI Flashcards</h3>
+              <p>Paste any text or upload a PDF and get a polished flashcard deck in seconds. Spaced repetition built in.</p>
+            </div>
+
+            <div class="feature-card fc-purple">
+              <div class="fc-icon-circle" style="--c:#ede9fe;--s:#7c3aed">🤖</div>
+              <h3>AI Study Buddy</h3>
+              <p>Ask questions, get explanations, and quiz yourself in a conversational chat — like a tutor available 24/7.</p>
+            </div>
+
+            <div class="feature-card fc-green">
+              <div class="fc-icon-circle" style="--c:#dcfce7;--s:#16a34a">📝</div>
+              <h3>Smart Notes</h3>
+              <p>Auto-summarize lectures and readings into clean, structured notes you can search and revisit anytime.</p>
+            </div>
+
+            <div class="feature-card fc-orange">
+              <div class="fc-icon-circle" style="--c:#ffedd5;--s:#ea580c">🎯</div>
+              <h3>Adaptive Quizzes</h3>
+              <p>Quizzes that adjust to your weak spots. The more you practice, the smarter the questions get.</p>
+            </div>
+
+            <div class="feature-card fc-pink">
+              <div class="fc-icon-circle" style="--c:#fce7f3;--s:#db2777">🔥</div>
+              <h3>Streak &amp; Goals</h3>
+              <p>Daily streaks, XP points, and goal-setting keep you motivated and consistent over the long haul.</p>
+            </div>
+
+            <div class="feature-card fc-teal">
+              <div class="fc-icon-circle" style="--c:#ccfbf1;--s:#0d9488">📈</div>
+              <h3>Progress Analytics</h3>
+              <p>Visual dashboards show exactly what you know, what needs work, and how far you've come.</p>
+            </div>
+
+          </div>
+        </div>
+
+        <button class="fc-nav fc-nav-next" id="fcNext" aria-label="Next">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+      <!-- Dots -->
+      <div class="fc-dots" id="fcDots"></div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <svg style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <linearGradient id="stepGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#4255ff"/>
+        <stop offset="100%" stop-color="#7c3aed"/>
+      </linearGradient>
+    </defs>
+  </svg>
+  <section class="section section-alt" id="how">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="steps-eyebrow">How It Works</div>
+        <h2 class="section-title">From material to mastery in 3 steps</h2>
+        <p class="section-sub">Upload, generate, and study — MindForge handles the heavy lifting so you can focus on learning.</p>
+      </div>
+
+      <!-- connector line -->
+      <div class="steps-track">
+        <div class="steps-line"><div class="steps-line-fill"></div></div>
+
+        <div class="steps-grid">
+
+          <div class="step-card reveal">
+            <div class="step-circle">
+              <svg class="step-ring" viewBox="0 0 64 64">
+                <circle class="step-ring-bg" cx="32" cy="32" r="28"/>
+                <circle class="step-ring-fill" cx="32" cy="32" r="28"/>
+              </svg>
+              <span class="step-circle-num">1</span>
+            </div>
+            <div class="step-card-body">
+              <div class="step-card-icon">📤</div>
+              <h3>Upload your material</h3>
+              <p>Drop in a PDF, paste text, or link a YouTube lecture. MindForge reads it all instantly.</p>
+              <div class="step-card-tag">Supports PDF · Text · YouTube</div>
+            </div>
+          </div>
+
+          <div class="step-card reveal" style="transition-delay:.15s">
+            <div class="step-circle">
+              <svg class="step-ring" viewBox="0 0 64 64">
+                <circle class="step-ring-bg" cx="32" cy="32" r="28"/>
+                <circle class="step-ring-fill" cx="32" cy="32" r="28"/>
+              </svg>
+              <span class="step-circle-num">2</span>
+            </div>
+            <div class="step-card-body">
+              <div class="step-card-icon">🤖</div>
+              <h3>AI generates your study set</h3>
+              <p>Flashcards, summaries, and quizzes are created instantly — tailored to your content.</p>
+              <div class="step-card-tag">Flashcards · Quizzes · Notes</div>
+            </div>
+          </div>
+
+          <div class="step-card reveal" style="transition-delay:.3s">
+            <div class="step-circle">
+              <svg class="step-ring" viewBox="0 0 64 64">
+                <circle class="step-ring-bg" cx="32" cy="32" r="28"/>
+                <circle class="step-ring-fill" cx="32" cy="32" r="28"/>
+              </svg>
+              <span class="step-circle-num">3</span>
+            </div>
+            <div class="step-card-body">
+              <div class="step-card-icon">📈</div>
+              <h3>Study, track, and improve</h3>
+              <p>Practice daily, watch your analytics grow, and hit your learning goals faster than ever.</p>
+              <div class="step-card-tag">Streaks · Analytics · Goals</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BANNER -->
+  <section class="cta-banner">
+    <div class="container cta-inner">
+      <h2>Your path to progress starts<br>with personalization.</h2>
+      <p>Join 50,000+ learners already studying smarter with MindForge.</p>
+      <div class="cta-btns">
+        <a href="signup.html" class="btn-signup">Get Started Free</a>
+        <a href="#profiling" class="btn-demo">Explore Demo</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <a href="#" class="logo">
+          <div class="logo-avatar"><span>⚡</span></div>
+          <span class="logo-text"><span class="logo-mind">Mind</span><span class="logo-forge">Forge</span></span>
+        </a>
+        <p>AI-powered learning for the modern student.</p>
+      </div>
+      <div class="footer-links">
+        <div>
+          <strong>Product</strong>
+          <a href="#features">Features</a>
+          <a href="dashboard.html">Dashboard</a>
+        </div>
+        <div>
+          <strong>Company</strong>
+          <a href="#">About</a>
+          <a href="#">Blog</a>
+          <a href="#">Careers</a>
+        </div>
+        <div>
+          <strong>Legal</strong>
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="#">Cookies</a>
+        </div>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>© 2025 MindForge. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
