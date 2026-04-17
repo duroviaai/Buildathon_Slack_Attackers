@@ -17,7 +17,15 @@ def create_app():
 
     # Register blueprints
     from .routes.auth_routes import auth_bp
+    from .routes.chatbot_routes import chat_bp
+    from .routes.flashcard_routes import flashcard_bp
+    from .routes.notes_routes import notes_bp
+    from .routes.quiz_routes import quiz_bp
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
+    app.register_blueprint(chat_bp, url_prefix="/api")
+    app.register_blueprint(flashcard_bp, url_prefix="/api")
+    app.register_blueprint(notes_bp, url_prefix="/api")
+    app.register_blueprint(quiz_bp, url_prefix="/api")
 
     # Serve frontend pages
     @app.route("/")
