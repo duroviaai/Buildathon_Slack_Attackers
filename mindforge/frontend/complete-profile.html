@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Complete Profile — MindForge</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    * { font-family: 'Inter', sans-serif; }
+    body { background: #f6f7fb; }
+    .input-field {
+      background: #fff; border: 2px solid #e2e8f0;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-field:focus {
+      outline: none; border-color: #4255ff;
+      box-shadow: 0 0 0 3px rgba(66,85,255,0.12);
+    }
+    .btn-primary {
+      background: #4255ff; transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover:not(:disabled) { background: #3346e0; transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.4); border-top-color: white;
+      border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center px-4 py-10">
+
+  <!-- Logo -->
+  <div class="mb-8 flex items-center gap-2">
+    <div class="w-9 h-9 rounded-lg bg-[#4255ff] flex items-center justify-center">
+      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+      </svg>
+    </div>
+    <span class="text-2xl font-extrabold text-gray-900 tracking-tight">Mind<span class="text-[#4255ff]">Forge</span></span>
+  </div>
+
+  <!-- Card -->
+  <div class="w-full max-w-sm bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-1">Complete your profile</h1>
+    <p class="text-sm text-gray-500 mb-6">Just one more step to get started</p>
+
+    <form id="complete-form" novalidate class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+        <input id="name" type="text" placeholder="Jane Doe" autocomplete="name"
+          class="input-field w-full px-4 py-2.5 rounded-xl text-gray-900 placeholder-gray-400 text-sm" />
+        <p id="err-name" class="hidden mt-1 text-xs text-red-500"></p>
+      </div>
+
+      <p id="err-form" class="hidden text-xs text-red-500 bg-red-50 border border-red-200 rounded-xl px-3 py-2"></p>
+
+      <button id="submit-btn" type="submit"
+        class="btn-primary w-full py-2.5 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2 mt-2">
+        <span class="btn-text">Continue</span>
+        <span class="btn-spinner hidden"><span class="spinner"></span></span>
+      </button>
+    </form>
+  </div>
+
+  <script>
+    const BASE_URL = 'http://127.0.0.1:5000/api';
+
+    function showError(fieldId, msg) {
+      const el = document.getElementById(`err-${fieldId}`);
+      if (el) { el.textContent = msg; el.classList.remove('hidden'); }
+    }
+
+    function clearErrors() {
+      document.querySelectorAll('[id^="err-"]').forEach(el => {
+        el.textContent = ''; el.classList.add('hidden');
+      });
+    }
+
+    function setLoading(btn, loading) {
+      btn.disabled = loading;
+      btn.querySelector('.btn-text').classList.toggle('hidden', loading);
+      btn.querySelector('.btn-spinner').classList.toggle('hidden', !loading);
+    }
+
+    document.getElementById('complete-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearErrors();
+
+      const name = document.getElementById('name').value.trim();
+      const credential = sessionStorage.getItem('mf_google_credential');
+      const role = sessionStorage.getItem('mf_google_role') || 'student';
+
+      if (!name) {
+        showError('name', 'Full name is required.');
+        return;
+      }
+      if (!credential) {
+        showError('form', 'Google sign-in session expired. Please try again.');
+        setTimeout(() => { window.location.href = '/signup.html'; }, 2000);
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      setLoading(btn, true);
+
+      try {
+        const res = await fetch(`${BASE_URL}/auth/google`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ credential, name, role })
+        });
+        const json = await res.json();
+        setLoading(btn, false);
+
+        if (!res.ok) {
+          showError('form', json.error || 'Something went wrong.');
+          return;
+        }
+
+        // Store token + user
+        localStorage.setItem('mf_token', json.token);
+        localStorage.setItem('mf_user', JSON.stringify(json.user));
+        sessionStorage.removeItem('mf_google_credential');
+        sessionStorage.removeItem('mf_google_role');
+
+        window.location.href = '/dashboard.html';
+      } catch {
+        setLoading(btn, false);
+        showError('form', 'Network error. Please try again.');
+      }
+    });
+  </script>
+</body>
+</html>

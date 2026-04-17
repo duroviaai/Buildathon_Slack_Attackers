@@ -34,6 +34,7 @@ const revealObs = new IntersectionObserver(entries => {
 document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
 
 // ── Step ring animations ───────────────────────────────────
+// Set staggered transition-delay on each ring fill before observing
 document.querySelectorAll('.step-circle').forEach((circle, i) => {
   const fill = circle.querySelector('.step-ring-fill');
   if (fill) fill.style.transitionDelay = `${i * 0.28}s`;

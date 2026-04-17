@@ -1,4 +1,4 @@
-const BASE_URL = "http://127.0.0.1:5000/api";
+const BASE_URL = "/api";
 
 /**
  * Core fetch wrapper — handles JSON, auth header, and error normalization.

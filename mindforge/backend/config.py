@@ -13,4 +13,8 @@ class Config:
         f"sqlite:///{os.path.join(_BASE_DIR, 'database', 'db.sqlite3')}"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    CORS_ORIGINS = ["http://127.0.0.1:5500", "http://localhost:5500", "null"]
+    CORS_ORIGINS = ["http://127.0.0.1:5500", "http://localhost:5500", "http://127.0.0.1:5000", "http://localhost:5000", "null"]
+    SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.gmail.com")
+    SMTP_PORT = int(os.environ.get("SMTP_PORT", 587))
+    SMTP_USER = os.environ.get("SMTP_USER", "")
+    SMTP_PASS = os.environ.get("SMTP_PASS", "")

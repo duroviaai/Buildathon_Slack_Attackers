@@ -5,239 +5,348 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sign Up — MindForge</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     * { font-family: 'Inter', sans-serif; }
-
-    body { background: #0a0a0f; }
-
-    .glow-border {
-      border: 1px solid rgba(139, 92, 246, 0.35);
-      box-shadow: 0 0 30px rgba(139, 92, 246, 0.08), inset 0 1px 0 rgba(255,255,255,0.05);
-    }
+    body { background: #f6f7fb; }
     .input-field {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: #fff; border: 2px solid #e2e8f0;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
     .input-field:focus {
-      outline: none;
-      border-color: rgba(139, 92, 246, 0.7);
-      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+      outline: none; border-color: #4255ff;
+      box-shadow: 0 0 0 3px rgba(66,85,255,0.12);
     }
     .btn-primary {
-      background: linear-gradient(135deg, #7c3aed, #4f46e5);
-      transition: opacity 0.2s, transform 0.15s;
+      background: #4255ff; transition: background 0.2s, transform 0.15s;
     }
-    .btn-primary:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+    .btn-primary:hover:not(:disabled) { background: #3346e0; transform: translateY(-1px); }
     .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .orb {
-      position: fixed; border-radius: 50%; filter: blur(80px);
-      pointer-events: none; z-index: 0;
+    .role-card {
+      border: 2px solid #e2e8f0; border-radius: 16px; cursor: pointer;
+      transition: all 0.2s; background: #fff;
     }
-
-    .role-option input[type="radio"] { display: none; }
-    .role-option label {
-      display: flex; align-items: center; gap: 8px;
-      padding: 10px 16px; border-radius: 10px; cursor: pointer;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.03);
-      color: #9ca3af; font-size: 0.875rem; font-weight: 500;
-      transition: all 0.2s;
-    }
-    .role-option input:checked + label {
-      border-color: rgba(139, 92, 246, 0.7);
-      background: rgba(139, 92, 246, 0.12);
-      color: #c4b5fd;
-    }
-
+    .role-card:hover { border-color: #4255ff; background: #f5f6ff; }
+    .role-card.selected { border-color: #4255ff; background: #eef0ff; }
+    .step { display: none; }
+    .step.active { display: block; }
     .spinner {
       width: 18px; height: 18px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      display: inline-block;
+      border: 2px solid rgba(255,255,255,0.4); border-top-color: white;
+      border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Password strength bar */
     #strength-bar { transition: width 0.3s, background-color 0.3s; }
+    .step-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #e2e8f0;
+      transition: background 0.3s;
+    }
+    .step-dot.active { background: #4255ff; }
+    .btn-google {
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    }
+    .btn-google:hover { background: #f0f1ff; border-color: #a5b4fc; transform: translateY(-1px); }
   </style>
 </head>
-<body class="min-h-screen flex items-center justify-center px-4 py-10 relative overflow-hidden">
+<body class="min-h-screen flex flex-col items-center justify-center px-4 py-10">
 
-  <!-- Background orbs -->
-  <div class="orb w-96 h-96 bg-violet-700 opacity-20" style="top:-80px;right:-80px;"></div>
-  <div class="orb w-80 h-80 bg-indigo-600 opacity-15" style="bottom:-60px;left:-60px;"></div>
+  <!-- Logo -->
+  <div class="mb-8 flex items-center gap-2">
+    <div class="w-9 h-9 rounded-lg bg-[#4255ff] flex items-center justify-center">
+      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+      </svg>
+    </div>
+    <span class="text-2xl font-extrabold text-gray-900 tracking-tight">Mind<span class="text-[#4255ff]">Forge</span></span>
+  </div>
 
-  <div class="relative z-10 w-full max-w-md">
+  <!-- Card -->
+  <div class="w-full max-w-sm bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
 
-    <!-- Logo -->
-    <div class="text-center mb-8">
-      <div class="inline-flex items-center gap-2 mb-3">
-        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-          </svg>
-        </div>
-        <span class="text-2xl font-extrabold text-white tracking-tight">MIND<span class="text-violet-400">FORGE</span></span>
-      </div>
-      <p class="text-gray-400 text-sm">Create your account and start learning.</p>
+    <!-- Step dots -->
+    <div class="flex justify-center gap-2 mb-6">
+      <div class="step-dot active" id="dot-1"></div>
+      <div class="step-dot" id="dot-2"></div>
+      <div class="step-dot" id="dot-3"></div>
+      <div class="step-dot" id="dot-4"></div>
+      <div class="step-dot" id="dot-5"></div>
     </div>
 
-    <!-- Form card -->
-    <div class="glow-border rounded-2xl p-8 bg-white/[0.03] backdrop-blur-sm">
-      <h1 class="text-xl font-bold text-white mb-6">Create your account</h1>
+    <!-- ── Step 1: Role ── -->
+    <div class="step active" id="step-1">
+      <h1 class="text-2xl font-bold text-gray-900 mb-1">I am a...</h1>
+      <p class="text-sm text-gray-500 mb-6">Choose your role to get started</p>
+      <div class="space-y-3">
+        <div class="role-card p-4 flex items-center gap-4" id="card-student" onclick="selectRole('student')">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-[#4255ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422A12.083 12.083 0 0121 12c0 3.866-4.03 7-9 7s-9-3.134-9-7a12.083 12.083 0 012.84-1.578L12 14z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="font-semibold text-gray-900 text-sm">Student</p>
+            <p class="text-xs text-gray-500">Learn, practice, and grow</p>
+          </div>
+        </div>
+        <div class="role-card p-4 flex items-center gap-4" id="card-teacher" onclick="selectRole('teacher')">
+          <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="font-semibold text-gray-900 text-sm">Teacher</p>
+            <p class="text-xs text-gray-500">Create content and manage students</p>
+          </div>
+        </div>
+      </div>
+      <p id="err-role" class="hidden mt-3 text-xs text-red-500">Please select a role.</p>
+      <button onclick="goStep(2)" class="btn-primary w-full py-2.5 rounded-xl text-white font-semibold text-sm mt-6">
+        Continue
+      </button>
+    </div>
 
-      <form id="signup-form" novalidate class="space-y-5">
+    <!-- ── Step 2: Auth method ── -->
+    <div class="step" id="step-2">
+      <h1 class="text-2xl font-bold text-gray-900 mb-1">Create account</h1>
+      <p class="text-sm text-gray-500 mb-6">How would you like to sign up?</p>
+      <div class="space-y-3">
+        <button onclick="goStep(3)"
+          class="w-full py-2.5 px-4 rounded-xl border-2 border-[#4255ff] text-[#4255ff] font-semibold text-sm flex items-center justify-center gap-2 hover:bg-[#eef0ff] transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+          Continue with Email
+        </button>
+        <button id="google-signup-btn" onclick="triggerGoogleSignup()"
+          class="btn-google w-full py-2.5 px-4 rounded-xl border-2 border-gray-200 text-gray-700 font-semibold text-sm flex items-center justify-center gap-2 bg-white">
+          <svg class="w-4 h-4" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Sign up with Google
+        </button>
+        <div id="google-btn-wrapper" style="display:none;"></div>
+      </div>
+      <button onclick="goStep(1)" class="mt-5 text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1 mx-auto">
+        ← Back
+      </button>
+    </div>
 
-        <!-- Full Name -->
+    <!-- ── Step 3: Name & Email ── -->
+    <div class="step" id="step-3">
+      <h1 class="text-2xl font-bold text-gray-900 mb-1">Your details</h1>
+      <p class="text-sm text-gray-500 mb-5">Tell us who you are</p>
+      <div class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1.5">Full Name</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
           <input id="name" type="text" placeholder="Jane Doe" autocomplete="name"
-            class="input-field w-full px-4 py-2.5 rounded-lg text-white placeholder-gray-500 text-sm" />
-          <p id="err-name" class="hidden mt-1 text-xs text-red-400"></p>
+            class="input-field w-full px-4 py-2.5 rounded-xl text-gray-900 placeholder-gray-400 text-sm" />
+          <p id="err-name" class="hidden mt-1 text-xs text-red-500"></p>
         </div>
-
-        <!-- Email -->
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
           <input id="email" type="email" placeholder="you@example.com" autocomplete="email"
-            class="input-field w-full px-4 py-2.5 rounded-lg text-white placeholder-gray-500 text-sm" />
-          <p id="err-email" class="hidden mt-1 text-xs text-red-400"></p>
+            class="input-field w-full px-4 py-2.5 rounded-xl text-gray-900 placeholder-gray-400 text-sm" />
+          <p id="err-email" class="hidden mt-1 text-xs text-red-500"></p>
         </div>
+        <button onclick="goStep(4)" class="btn-primary w-full py-2.5 rounded-xl text-white font-semibold text-sm mt-2">
+          Continue
+        </button>
+      </div>
+      <button onclick="goStep(2)" class="mt-4 text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1 mx-auto">
+        ← Back
+      </button>
+    </div>
 
-        <!-- Password -->
+    <!-- ── Step 4: Password ── -->
+    <div class="step" id="step-4">
+      <h1 class="text-2xl font-bold text-gray-900 mb-1">Set password</h1>
+      <p class="text-sm text-gray-500 mb-5">Choose a secure password</p>
+      <form id="signup-form" novalidate class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1.5">Password</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
           <div class="relative">
             <input id="password" type="password" placeholder="Min. 6 characters" autocomplete="new-password"
               oninput="updateStrength(this.value)"
-              class="input-field w-full px-4 py-2.5 rounded-lg text-white placeholder-gray-500 text-sm pr-10" />
+              class="input-field w-full px-4 py-2.5 rounded-xl text-gray-900 placeholder-gray-400 text-sm pr-10" />
             <button type="button" onclick="togglePwd('password')"
-              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors">
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
               </svg>
             </button>
           </div>
-          <!-- Strength bar -->
-          <div class="mt-2 h-1 w-full bg-white/10 rounded-full overflow-hidden">
-            <div id="strength-bar" class="h-full w-0 rounded-full bg-red-500"></div>
+          <div class="mt-2 h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+            <div id="strength-bar" class="h-full w-0 rounded-full bg-red-400"></div>
           </div>
-          <p id="err-password" class="hidden mt-1 text-xs text-red-400"></p>
+          <p id="err-password" class="hidden mt-1 text-xs text-red-500"></p>
         </div>
-
-        <!-- Confirm Password -->
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1.5">Confirm Password</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
           <div class="relative">
             <input id="confirm" type="password" placeholder="Re-enter password" autocomplete="new-password"
-              class="input-field w-full px-4 py-2.5 rounded-lg text-white placeholder-gray-500 text-sm pr-10" />
+              class="input-field w-full px-4 py-2.5 rounded-xl text-gray-900 placeholder-gray-400 text-sm pr-10" />
             <button type="button" onclick="togglePwd('confirm')"
-              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors">
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
               </svg>
             </button>
           </div>
-          <p id="err-confirm" class="hidden mt-1 text-xs text-red-400"></p>
+          <p id="err-confirm" class="hidden mt-1 text-xs text-red-500"></p>
         </div>
-
-        <!-- Role -->
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">I am a...</label>
-          <div class="grid grid-cols-2 gap-3">
-            <div class="role-option">
-              <input type="radio" id="role-student" name="role-radio" value="student" checked />
-              <label for="role-student">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 14l9-5-9-5-9 5 9 5z"/>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 14l6.16-3.422A12.083 12.083 0 0121 12c0 3.866-4.03 7-9 7s-9-3.134-9-7a12.083 12.083 0 012.84-1.578L12 14z"/>
-                </svg>
-                Student
-              </label>
-            </div>
-            <div class="role-option">
-              <input type="radio" id="role-teacher" name="role-radio" value="teacher" />
-              <label for="role-teacher">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
-                </svg>
-                Teacher
-              </label>
-            </div>
-          </div>
-          <!-- Hidden select synced with radio -->
-          <select id="role" class="hidden">
-            <option value="student">student</option>
-            <option value="teacher">teacher</option>
-          </select>
-        </div>
-
-        <!-- Form-level error -->
-        <p id="err-form" class="hidden text-xs text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg px-3 py-2"></p>
-
-        <!-- Submit -->
+        <input type="hidden" id="role" value="student" />
+        <p id="err-form" class="hidden text-xs text-red-500 bg-red-50 border border-red-200 rounded-xl px-3 py-2"></p>
         <button id="submit-btn" type="submit"
-          class="btn-primary w-full py-2.5 rounded-lg text-white font-semibold text-sm flex items-center justify-center gap-2">
+          class="btn-primary w-full py-2.5 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2 mt-2">
           <span class="btn-text">Create Account</span>
           <span class="btn-spinner hidden"><span class="spinner"></span></span>
         </button>
-
       </form>
+      <button onclick="goStep(3)" class="mt-4 text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1 mx-auto">
+        ← Back
+      </button>
+    </div>
 
-      <p class="mt-6 text-center text-sm text-gray-500">
-        Already have an account?
-        <a href="login.html" class="text-violet-400 hover:text-violet-300 font-medium transition-colors">Sign in</a>
-      </p>
+    <!-- ── Step 5: OTP Verification ── -->
+    <div class="step" id="step-5">
+      <h1 class="text-2xl font-bold text-gray-900 mb-1">Verify your email</h1>
+      <p class="text-sm text-gray-500 mb-5">Enter the 6-digit code sent to <span id="otp-email-display" class="font-semibold text-gray-700"></span></p>
+      <form id="otp-form" novalidate class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Verification Code</label>
+          <input id="otp-input" type="text" inputmode="numeric" maxlength="6" placeholder="••••••"
+            class="input-field w-full px-4 py-2.5 rounded-xl text-gray-900 placeholder-gray-400 text-sm tracking-widest text-center text-lg" />
+          <p id="err-otp" class="hidden mt-1 text-xs text-red-500"></p>
+        </div>
+        <p id="err-otp-form" class="hidden text-xs text-red-500 bg-red-50 border border-red-200 rounded-xl px-3 py-2"></p>
+        <button id="otp-submit-btn" type="submit"
+          class="btn-primary w-full py-2.5 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2 mt-2">
+          <span class="btn-text">Verify & Create Account</span>
+          <span class="btn-spinner hidden"><span class="spinner"></span></span>
+        </button>
+      </form>
+      <div class="mt-3 text-center">
+        <button id="resend-btn" onclick="resendOtp()" class="text-xs text-[#4255ff] hover:underline">Resend code</button>
+      </div>
+    </div>
+
+    <div class="mt-5 pt-5 border-t border-gray-100 text-center text-sm text-gray-500">
+      Already have an account?
+      <a href="login.html" class="text-[#4255ff] hover:underline font-semibold ml-1">Sign in</a>
     </div>
   </div>
 
   <script>
-    // Sync radio buttons → hidden select
-    document.querySelectorAll('input[name="role-radio"]').forEach((radio) => {
-      radio.addEventListener("change", () => {
-        document.getElementById("role").value = radio.value;
+    let selectedRole = null;
+
+    function selectRole(role) {
+      selectedRole = role;
+      document.getElementById('card-student').classList.toggle('selected', role === 'student');
+      document.getElementById('card-teacher').classList.toggle('selected', role === 'teacher');
+      document.getElementById('err-role').classList.add('hidden');
+    }
+
+    function goStep(n) {
+      if (n === 2 && !selectedRole) {
+        document.getElementById('err-role').classList.remove('hidden');
+        return;
+      }
+      if (n === 4) {
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        let valid = true;
+        const errName = document.getElementById('err-name');
+        const errEmail = document.getElementById('err-email');
+        errName.classList.add('hidden');
+        errEmail.classList.add('hidden');
+        if (!name) { errName.textContent = 'Full name is required.'; errName.classList.remove('hidden'); valid = false; }
+        if (!email || !/^[^@]+@[^@]+\.[^@]+$/.test(email)) { errEmail.textContent = 'Enter a valid email.'; errEmail.classList.remove('hidden'); valid = false; }
+        if (!valid) return;
+        document.getElementById('role').value = selectedRole;
+      }
+      document.querySelectorAll('.step').forEach((s, i) => {
+        s.classList.toggle('active', i + 1 === n);
       });
-    });
+      for (let i = 1; i <= 5; i++) {
+        document.getElementById(`dot-${i}`).classList.toggle('active', i === n);
+      }
+    }
 
     function togglePwd(id) {
-      const input = document.getElementById(id);
-      input.type = input.type === "password" ? "text" : "password";
+      const el = document.getElementById(id);
+      el.type = el.type === 'password' ? 'text' : 'password';
     }
 
     function updateStrength(val) {
-      const bar = document.getElementById("strength-bar");
+      const bar = document.getElementById('strength-bar');
       let score = 0;
       if (val.length >= 6)  score++;
       if (val.length >= 10) score++;
       if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
       if (/[^A-Za-z0-9]/.test(val)) score++;
-
       const map = [
-        { w: "0%",   bg: "bg-red-500" },
-        { w: "25%",  bg: "bg-red-500" },
-        { w: "50%",  bg: "bg-yellow-500" },
-        { w: "75%",  bg: "bg-blue-500" },
-        { w: "100%", bg: "bg-emerald-500" },
+        { w: '0%',   bg: '#f87171' },
+        { w: '25%',  bg: '#f87171' },
+        { w: '50%',  bg: '#facc15' },
+        { w: '75%',  bg: '#60a5fa' },
+        { w: '100%', bg: '#34d399' },
       ];
       bar.style.width = map[score].w;
-      bar.className = `h-full rounded-full transition-all duration-300 ${map[score].bg}`;
+      bar.style.background = map[score].bg;
+    }
+
+    const GOOGLE_CLIENT_ID = '554482016091-elsto1gd07q56t9ni97ho43rgjvvmh59.apps.googleusercontent.com';
+    let googleInitialized = false;
+
+    function initGoogleButton() {
+      if (typeof google === 'undefined') {
+        setTimeout(initGoogleButton, 100);
+        return;
+      }
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleSignup
+      });
+      googleInitialized = true;
+    }
+
+    function triggerGoogleSignup() {
+      if (!googleInitialized) {
+        alert('Google Sign-In is still loading. Please try again.');
+        return;
+      }
+      google.accounts.id.prompt();
+    }
+
+    async function handleGoogleSignup(response) {
+      sessionStorage.setItem('mf_google_credential', response.credential);
+      sessionStorage.setItem('mf_google_role', selectedRole || 'student');
+      window.location.href = '/complete-profile.html';
+    }
+
+    initGoogleButton();
+
+    async function resendOtp() {
+      const email = document.getElementById('email').value.trim();
+      const btn = document.getElementById('resend-btn');
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      await api.sendOtp({ email, purpose: 'register' });
+      btn.textContent = 'Resend code';
+      setTimeout(() => { btn.disabled = false; }, 30000);
     }
   </script>
-  <script type="module" src="assets/js/auth.js"></script>
+  <script src="assets/js/auth.js"></script>
 </body>
 </html>

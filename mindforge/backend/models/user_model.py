@@ -7,8 +7,9 @@ class User(db.Model):
     id         = db.Column(db.Integer, primary_key=True)
     name       = db.Column(db.String(120), nullable=False)
     email      = db.Column(db.String(120), unique=True, nullable=False)
-    password   = db.Column(db.String(255), nullable=False)
+    password   = db.Column(db.String(255), nullable=True)   # nullable for Google OAuth users
     role       = db.Column(db.String(20), nullable=False, default="student")
+    google_id  = db.Column(db.String(120), unique=True, nullable=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def to_dict(self):

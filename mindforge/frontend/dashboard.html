@@ -42,7 +42,7 @@
 
   <script>
     const user = JSON.parse(localStorage.getItem("mf_user") || "null");
-    if (!user) { window.location.href = "login.html"; }
+    if (!user) { window.location.href = "/login.html"; }
     else {
       document.getElementById("user-avatar").textContent = user.name.charAt(0).toUpperCase();
       document.getElementById("user-greeting").textContent = `${user.name} · ${user.role}`;
@@ -50,7 +50,7 @@
     function logout() {
       localStorage.removeItem("mf_token");
       localStorage.removeItem("mf_user");
-      window.location.href = "login.html";
+      window.location.href = "/login.html";
     }
   </script>
 </body>
