@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sign Up — MindForge</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     * { font-family: 'Inter', sans-serif; }
@@ -307,35 +307,30 @@
     }
 
     const GOOGLE_CLIENT_ID = '554482016091-elsto1gd07q56t9ni97ho43rgjvvmh59.apps.googleusercontent.com';
-    let googleInitialized = false;
-
-    function initGoogleButton() {
-      if (typeof google === 'undefined') {
-        setTimeout(initGoogleButton, 100);
-        return;
-      }
-      google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: handleGoogleSignup
-      });
-      googleInitialized = true;
-    }
+    const GOOGLE_REDIRECT_URI = 'http://127.0.0.1:5000/api/auth/google/callback';
 
     function triggerGoogleSignup() {
-      if (!googleInitialized) {
-        alert('Google Sign-In is still loading. Please try again.');
-        return;
-      }
-      google.accounts.id.prompt();
+      const params = new URLSearchParams({
+        client_id: GOOGLE_CLIENT_ID,
+        redirect_uri: GOOGLE_REDIRECT_URI,
+        response_type: 'code',
+        scope: 'openid email profile',
+        access_type: 'offline',
+        prompt: 'select_account'
+      });
+      const popup = window.open(
+        'https://accounts.google.com/o/oauth2/v2/auth?' + params.toString(),
+        'google-signup', 'width=500,height=600,left=200,top=100'
+      );
+      window.addEventListener('message', function handler(e) {
+        if (e.origin !== 'http://127.0.0.1:5000') return;
+        window.removeEventListener('message', handler);
+        if (e.data.error) { alert(e.data.error); return; }
+        localStorage.setItem('mf_token', e.data.token);
+        localStorage.setItem('mf_user', JSON.stringify(e.data.user));
+        window.location.href = 'pages/learner-profiling.html';
+      });
     }
-
-    async function handleGoogleSignup(response) {
-      sessionStorage.setItem('mf_google_credential', response.credential);
-      sessionStorage.setItem('mf_google_role', selectedRole || 'student');
-      window.location.href = '/complete-profile.html';
-    }
-
-    initGoogleButton();
 
     async function resendOtp() {
       const email = document.getElementById('email').value.trim();

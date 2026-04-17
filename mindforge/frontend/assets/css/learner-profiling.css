@@ -1,0 +1,80 @@
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  background: #f8f9fc;
+  color: #0f172a;
+}
+.blob {
+  filter: blur(12px);
+  opacity: 0.55;
+}
+.question-panel {
+  min-height: 420px;
+}
+.option-card {
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1), background-color 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.option-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+.option-card.selected {
+  border-color: rgba(37, 99, 235, 0.95);
+  background: rgba(37, 99, 235, 0.06);
+  box-shadow: 0 14px 36px rgba(37, 99, 235, 0.14);
+}
+.option-card.selected .tick {
+  opacity: 1;
+  transform: scale(1);
+}
+.tick {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.screen-enter {
+  animation: fadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.input-glow:focus {
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+.progress-bar {
+  transition: width 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+.confetti-piece {
+  position: absolute;
+  top: 0;
+  width: 10px;
+  height: 16px;
+  border-radius: 999px;
+  animation: confettiFall 1.6s ease-out forwards;
+}
+.check-path {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: drawCheck 0.8s ease forwards 0.25s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes fadeUp {
+  0% { opacity: 0; transform: translateY(14px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes confettiFall {
+  0% { opacity: 1; transform: translateY(-10px) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(220px) rotate(540deg); }
+}
+@keyframes drawCheck {
+  0% { stroke-dashoffset: 100; }
+  100% { stroke-dashoffset: 0; }
+}

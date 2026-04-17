@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Learner Profiling - MindForge</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#2563eb',
+            darktext: '#0f172a',
+            muted: '#64748b',
+            softbg: '#f8f9fc',
+            success: '#16a34a'
+          },
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif']
+          },
+          boxShadow: {
+            soft: '0 10px 30px rgba(15, 23, 42, 0.06)',
+            card: '0 8px 24px rgba(15, 23, 42, 0.06)',
+            lift: '0 14px 40px rgba(37, 99, 235, 0.12)'
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-12px)' }
+            },
+            fadeUp: {
+              '0%': { opacity: '0', transform: 'translateY(14px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' }
+            },
+            confettiFall: {
+              '0%': { opacity: '1', transform: 'translateY(-10px) rotate(0deg)' },
+              '100%': { opacity: '0', transform: 'translateY(220px) rotate(540deg)' }
+            },
+            drawCheck: {
+              '0%': { strokeDashoffset: '100' },
+              '100%': { strokeDashoffset: '0' }
+            }
+          },
+          animation: {
+            float: 'float 6s ease-in-out infinite',
+            fadeUp: 'fadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1)',
+            confettiFall: 'confettiFall 1.6s ease-out forwards'
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/learner-profiling.css">
+</head>
+<body class="min-h-screen overflow-x-hidden bg-softbg text-darktext">
+  <div class="pointer-events-none fixed inset-0 overflow-hidden">
+    <div class="blob absolute -left-14 top-16 h-48 w-48 rounded-full bg-blue-200/70 animate-float"></div>
+    <div class="blob absolute right-[-4rem] top-28 h-56 w-56 rounded-full bg-sky-100/80 animate-float" style="animation-delay: 1s;"></div>
+    <div class="blob absolute bottom-12 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-indigo-100/60 animate-float" style="animation-delay: 2s;"></div>
+  </div>
+
+  <div class="relative z-10 min-h-screen">
+    <header class="border-b border-slate-200/70 bg-softbg/90 backdrop-blur">
+      <div class="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+        <div class="flex items-center gap-3">
+          <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-soft ring-1 ring-slate-200/70">
+            <svg viewBox="0 0 48 48" class="h-7 w-7 text-primary" aria-label="MindForge logo" fill="none">
+              <path d="M10 32V16.5L24 8l14 8.5V32L24 40l-14-8Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+              <path d="M18 20.5h12M18 26h8" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-lg font-semibold tracking-tight text-darktext">MindForge</p>
+            <p class="text-sm text-muted">Learner Profiling</p>
+          </div>
+        </div>
+        <p class="text-sm font-medium text-muted sm:text-base">Personal Setup</p>
+      </div>
+      <div class="h-[3px] w-full bg-slate-200/70" aria-hidden="true">
+        <div id="progressBar" class="progress-bar h-full rounded-r-full bg-primary" style="width: 14%;"></div>
+      </div>
+    </header>
+
+    <main id="main-content" class="mx-auto flex min-h-[calc(100vh-76px)] w-full max-w-6xl items-center justify-center px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+      <section class="w-full max-w-3xl animate-fadeUp">
+        <div class="mb-5 flex items-center justify-between px-1">
+          <div>
+            <p id="stepText" class="text-sm font-semibold text-primary">Step 1 of 7</p>
+            <p id="stepHint" class="text-sm text-muted">Let's begin with a quick introduction.</p>
+          </div>
+          <div class="rounded-full border border-slate-200 bg-white px-3 py-1 text-sm font-medium text-muted shadow-sm">
+            <span id="progressText">14%</span> complete
+          </div>
+        </div>
+
+        <div class="question-panel relative overflow-hidden rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-card sm:p-8 lg:p-10">
+          <div id="confettiLayer" class="pointer-events-none absolute inset-0 overflow-hidden"></div>
+          <div id="screen" class="screen-enter"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:5000/api";
+    const token = localStorage.getItem("mf_token");
+    if (!token) {
+      window.location.href = "../login.html";
+    }
+
+    const questions = [
+      {
+        type: 'text',
+        key: 'name',
+        title: 'Before we begin, what should we call you?',
+        subtitle: 'So the experience feels personal and less robotic.',
+        placeholder: 'Enter your name'
+      },
+      {
+        type: 'options',
+        key: 'subject',
+        title: name => `Great, ${name}. What do you want to learn right now?`,
+        subtitle: 'Choose the area you want MindForge to tune for first.',
+        options: ['Programming', 'Mathematics', 'Science', 'Exam Preparation', 'Other']
+      },
+      {
+        type: 'options',
+        key: 'level',
+        title: 'How would you rate your current level?',
+        subtitle: 'This helps us set the right pace from day one.',
+        options: ['Beginner', 'Intermediate', 'Advanced']
+      },
+      {
+        type: 'options',
+        key: 'duration',
+        title: 'How long do you prefer learning at a time?',
+        subtitle: "We'll shape lessons around your ideal attention window.",
+        options: ['2–3 min', '5–7 min', '10+ min']
+      },
+      {
+        type: 'options',
+        key: 'style',
+        title: 'How do you prefer to learn?',
+        subtitle: 'Pick the style that feels most natural to you.',
+        options: ['Simple explanations', 'Step-by-step examples', 'Practice questions', 'Visual / real-life examples']
+      },
+      {
+        type: 'options',
+        key: 'difficulty',
+        title: 'When learning something new, what do you prefer?',
+        subtitle: 'We can keep it gentle, balanced, or stretch your thinking.',
+        options: ['Start easy', 'Moderate difficulty', 'Challenge me']
+      },
+      {
+        type: 'options',
+        key: 'confidence',
+        title: 'How confident are you in this subject?',
+        subtitle: 'Your confidence helps us calibrate encouragement and review.',
+        options: ['Not confident', 'Somewhat confident', 'Very confident']
+      }
+    ];
+
+    const state = {
+      step: 0,
+      answers: {
+        name: '',
+        subject: '',
+        level: '',
+        duration: '',
+        style: '',
+        difficulty: '',
+        confidence: ''
+      },
+      completed: false
+    };
+
+    const screen = document.getElementById('screen');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const stepText = document.getElementById('stepText');
+    const stepHint = document.getElementById('stepHint');
+    const confettiLayer = document.getElementById('confettiLayer');
+
+    function getProgressPercent() {
+      if (state.completed) return 100;
+      return Math.round(((state.step + 1) / questions.length) * 100);
+    }
+
+    function isCurrentStepValid() {
+      const current = questions[state.step];
+      const value = state.answers[current.key];
+      return typeof value === 'string' ? value.trim().length > 0 : Boolean(value);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function render() {
+      const percent = getProgressPercent();
+      progressBar.style.width = `${percent}%`;
+      progressText.textContent = `${percent}%`;
+
+      if (state.completed) {
+        stepText.textContent = 'Profile ready';
+        stepHint.textContent = 'MindForge is now tuned for you.';
+        renderSuccess();
+        return;
+      }
+
+      const current = questions[state.step];
+      stepText.textContent = `Step ${state.step + 1} of ${questions.length}`;
+      stepHint.textContent = current.type === 'text'
+        ? "Let's begin with a quick introduction."
+        : 'Select the option that best matches you.';
+
+      if (current.type === 'text') {
+        renderTextQuestion(current);
+      } else {
+        renderOptionsQuestion(current);
+      }
+    }
+
+    function renderTextQuestion(question) {
+      const value = state.answers[question.key];
+      screen.className = 'screen-enter';
+      screen.innerHTML = `
+        <div class="flex min-h-[340px] flex-col justify-between gap-8">
+          <div class="space-y-4">
+            <div class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-primary">Learner onboarding</div>
+            <div class="space-y-3">
+              <h1 class="text-3xl font-bold tracking-tight text-darktext sm:text-4xl">${question.title}</h1>
+              <p class="max-w-2xl text-base leading-7 text-muted sm:text-lg">${question.subtitle}</p>
+            </div>
+            <div class="pt-3">
+              <label for="nameInput" class="mb-3 block text-sm font-semibold text-darktext">Your name</label>
+              <input
+                id="nameInput"
+                type="text"
+                value="${escapeHtml(value)}"
+                placeholder="${question.placeholder}"
+                autocomplete="given-name"
+                class="input-glow h-14 w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 text-base text-darktext outline-none placeholder:text-slate-400 focus:border-primary focus:bg-white"
+              />
+            </div>
+          </div>
+
+          <div class="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+            <button type="button" class="min-h-[48px] rounded-2xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-400" disabled>Back</button>
+            <button data-primary type="button" ${value.trim() ? '' : 'disabled'} class="btn-primary min-h-[50px] rounded-2xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lift">
+              Continue
+            </button>
+          </div>
+        </div>
+      `;
+
+      const input = document.getElementById('nameInput');
+      const continueBtn = screen.querySelector('[data-primary]');
+
+      input.addEventListener('input', (e) => {
+        state.answers.name = e.target.value;
+        continueBtn.disabled = !state.answers.name.trim();
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && state.answers.name.trim()) {
+          goNext();
+        }
+      });
+
+      continueBtn.addEventListener('click', goNext);
+    }
+
+    function renderOptionsQuestion(question) {
+      const selected = state.answers[question.key];
+      const title = typeof question.title === 'function' ? question.title(state.answers.name.trim() || 'there') : question.title;
+      const finalStep = state.step === questions.length - 1;
+      screen.className = 'screen-enter';
+      screen.innerHTML = `
+        <div class="flex min-h-[340px] flex-col justify-between gap-8">
+          <div class="space-y-5">
+            <div class="space-y-3">
+              <h1 class="text-2xl font-bold tracking-tight text-darktext sm:text-3xl">${title}</h1>
+              <p class="max-w-2xl text-base leading-7 text-muted">${question.subtitle}</p>
+            </div>
+
+            <fieldset>
+              <legend class="sr-only">${title}</legend>
+              <div class="grid gap-3 sm:gap-4 ${question.options.length > 3 ? 'sm:grid-cols-2' : ''}">
+                ${question.options.map(option => `
+                  <button
+                    type="button"
+                    class="option-card group flex min-h-[72px] items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-4 text-left sm:px-5 ${selected === option ? 'selected' : ''}"
+                    data-option="${escapeHtml(option)}"
+                  >
+                    <span class="block text-base font-semibold text-darktext">${option}</span>
+                    <span class="tick flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white shadow-sm">
+                      <svg viewBox="0 0 20 20" class="h-4 w-4" fill="none">
+                        <path d="M4.5 10.5 8 14l7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </span>
+                  </button>
+                `).join('')}
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+            <button type="button" data-back class="min-h-[50px] rounded-2xl border border-slate-200 px-5 py-3 text-sm font-semibold text-darktext transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50">Back</button>
+            <button data-primary type="button" ${selected ? '' : 'disabled'} class="btn-primary min-h-[50px] rounded-2xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lift">
+              ${finalStep ? 'Create My Profile' : 'Continue'}
+            </button>
+          </div>
+        </div>
+      `;
+
+      screen.querySelectorAll('[data-option]').forEach((button) => {
+        button.addEventListener('click', () => {
+          state.answers[question.key] = button.dataset.option;
+          render();
+        });
+      });
+
+      screen.querySelector('[data-back]').addEventListener('click', goBack);
+      screen.querySelector('[data-primary]').addEventListener('click', goNext);
+    }
+
+    function renderSuccess() {
+      const name = state.answers.name.trim() || 'Learner';
+      screen.className = 'screen-enter';
+      screen.innerHTML = `
+        <div class="relative flex min-h-[360px] flex-col items-center justify-center gap-7 py-3 text-center">
+          <div class="relative flex h-24 w-24 items-center justify-center rounded-full bg-green-50 ring-8 ring-green-50/60">
+            <svg viewBox="0 0 64 64" class="h-16 w-16" fill="none">
+              <circle cx="32" cy="32" r="24" stroke="#16a34a" stroke-width="4" opacity="0.18"></circle>
+              <path class="check-path" d="M20 33.5 28.5 42 45 24.5" stroke="#16a34a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </div>
+
+          <div class="space-y-3">
+            <p class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-primary">Profile complete</p>
+            <h1 class="text-3xl font-bold tracking-tight text-darktext sm:text-4xl">You're ready to learn with confidence, ${escapeHtml(name)}.</h1>
+            <p class="mx-auto max-w-2xl text-base leading-7 text-muted sm:text-lg">MindForge is now tuned for you.</p>
+          </div>
+
+          <div class="flex w-full max-w-xl flex-col gap-3 sm:flex-row sm:justify-center">
+            <button type="button" id="goDashboard" class="min-h-[50px] rounded-2xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lift">Go to Dashboard</button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('goDashboard').addEventListener('click', () => {
+        window.location.href = "../dashboard.html";
+      });
+
+      launchConfetti();
+    }
+
+    async function goNext() {
+      if (!isCurrentStepValid()) return;
+      if (state.step < questions.length - 1) {
+        state.step += 1;
+        render();
+      } else {
+        await saveProfile();
+        state.completed = true;
+        render();
+      }
+    }
+
+    function goBack() {
+      if (state.step > 0) {
+        state.step -= 1;
+        render();
+      }
+    }
+
+    async function saveProfile() {
+      try {
+        const response = await fetch(`${API_BASE}/learner-profiling`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify(state.answers)
+        });
+        if (!response.ok) {
+          console.error("Failed to save profile");
+        }
+      } catch (error) {
+        console.error("Error saving profile:", error);
+      }
+    }
+
+    function launchConfetti() {
+      confettiLayer.innerHTML = '';
+      const colors = ['#2563eb', '#60a5fa', '#16a34a', '#93c5fd', '#1d4ed8', '#bfdbfe'];
+      for (let i = 0; i < 28; i++) {
+        const piece = document.createElement('span');
+        piece.className = 'confetti-piece';
+        piece.style.left = `${Math.random() * 100}%`;
+        piece.style.background = colors[i % colors.length];
+        piece.style.transform = `translateY(-12px) rotate(${Math.random() * 180}deg)`;
+        piece.style.animationDelay = `${Math.random() * 0.25}s`;
+        piece.style.opacity = 1;
+        confettiLayer.appendChild(piece);
+      }
+      setTimeout(() => {
+        confettiLayer.innerHTML = '';
+      }, 1900);
+    }
+
+    render();
+  </script>
+</body>
+</html>

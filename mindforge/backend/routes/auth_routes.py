@@ -1,10 +1,16 @@
 import re
-from flask import Blueprint, request, jsonify
+import os
+import requests as http_requests
+from flask import Blueprint, request, jsonify, redirect
 from ..services.auth_service import register_user, login_user, google_auth_user, reset_user_password
 from ..services.otp_service import send_otp, verify_otp
 from ..models.user_model import User
 
 auth_bp = Blueprint("auth", __name__)
+
+GOOGLE_CLIENT_ID     = os.environ.get("GOOGLE_CLIENT_ID", "554482016091-elsto1gd07q56t9ni97ho43rgjvvmh59.apps.googleusercontent.com")
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
+GOOGLE_REDIRECT_URI  = "http://127.0.0.1:5000/api/auth/google/callback"
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
@@ -44,6 +50,69 @@ def login():
     if error:
         return jsonify({"error": error}), 401
     return jsonify({"token": token, "user": user}), 200
+
+
+@auth_bp.route("/google/callback", methods=["GET"])
+def google_callback():
+    code = request.args.get("code")
+    if not code:
+        return _popup_result(None, None, "No code returned from Google.")
+
+    # Exchange code for tokens
+    token_res = http_requests.post("https://oauth2.googleapis.com/token", data={
+        "code": code,
+        "client_id": GOOGLE_CLIENT_ID,
+        "client_secret": GOOGLE_CLIENT_SECRET,
+        "redirect_uri": GOOGLE_REDIRECT_URI,
+        "grant_type": "authorization_code"
+    })
+    token_data = token_res.json()
+    id_token_str = token_data.get("id_token")
+    if not id_token_str:
+        return _popup_result(None, None, token_data.get("error_description", "Token exchange failed."))
+
+    from google.oauth2 import id_token as google_id_token
+    from google.auth.transport import requests as google_requests
+    try:
+        info = google_id_token.verify_oauth2_token(id_token_str, google_requests.Request(), GOOGLE_CLIENT_ID)
+    except ValueError as e:
+        return _popup_result(None, None, str(e))
+
+    google_id = info["sub"]
+    email     = info.get("email", "").lower()
+    name      = info.get("name", "") or email.split("@")[0]
+
+    from ..services.auth_service import _make_token
+    from ..extensions import db
+    user = User.query.filter_by(google_id=google_id).first()
+    if not user:
+        user = User.query.filter_by(email=email).first()
+        if user:
+            user.google_id = google_id
+        else:
+            user = User(name=name, email=email, password=None, google_id=google_id, role="student")
+            db.session.add(user)
+    db.session.commit()
+
+    jwt_token = _make_token(user)
+    return _popup_result(jwt_token, user.to_dict(), None)
+
+
+def _popup_result(token, user, error):
+    """Returns an HTML page that sends result to opener via postMessage then closes."""
+    if error:
+        payload = f'{{"error": "{error}"}}'
+    else:
+        import json
+        payload = json.dumps({"token": token, "user": user})
+    html = f"""<!DOCTYPE html><html><body><script>
+  window.opener && window.opener.postMessage({payload}, 'http://127.0.0.1:5000');
+  window.close();
+</script></body></html>"""
+    from flask import make_response
+    resp = make_response(html, 200)
+    resp.headers["Content-Type"] = "text/html"
+    return resp
 
 
 @auth_bp.route("/google", methods=["POST"])
