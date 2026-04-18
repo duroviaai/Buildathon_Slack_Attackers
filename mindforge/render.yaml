@@ -24,3 +24,5 @@ services:
         sync: false
       - key: SAMBANOVA_API_KEY
         sync: false
+      - key: GOOGLE_REDIRECT_URI
+        value: https://mindforge.onrender.com/api/auth/google/callback

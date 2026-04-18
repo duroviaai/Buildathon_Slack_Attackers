@@ -95,9 +95,7 @@
         <a href="quiz.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 transition cursor-pointer">
           <i data-lucide="clipboard-list" class="w-4 h-4"></i> Quiz
         </a>
-        <a href="learner-profiling.html" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 transition cursor-pointer">
-          <i data-lucide="user-check" class="w-4 h-4"></i> Learner Profile
-        </a>
+
       </nav>
     </div>
 
@@ -173,6 +171,9 @@
     const API_BASE = "http://127.0.0.1:5000/api";
     const token = localStorage.getItem("mf_token");
     if (!token) window.location.href = "../login.html";
+
+    // Always redirect to dashboard — profiling is now a popup there
+    window.location.href = "../dashboard.html";
 
     lucide.createIcons();
 

@@ -1,5 +1,5 @@
-import os, json, re
-from openai import OpenAI
+import os, json, re, time
+from openai import OpenAI, RateLimitError
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -16,12 +16,33 @@ def generate_quiz(text: str, count: int = 10) -> list:
         f'[{{"question":"...","options":["A","B","C","D"],"correct_index":0,"explanation":"..."}}]. '
         f"No markdown, no explanation outside JSON.\n\n{text[:4000]}"
     )
-    response = _client.chat.completions.create(
-        model="Meta-Llama-3.3-70B-Instruct",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.5,
-        max_tokens=3000,
-    )
+    messages = [{"role": "user", "content": prompt}]
+
+    last_err = None
+    response = None
+    for model in ["gemma-3-12b-it", "Meta-Llama-3.3-70B-Instruct"]:
+        try:
+            response = _client.chat.completions.create(
+                model=model,
+                messages=messages,
+                temperature=0.5,
+                max_tokens=3000,
+            )
+            last_err = None
+            break
+        except RateLimitError as e:
+            last_err = e
+            time.sleep(3)
+
+    if last_err:
+        raise ValueError("The AI service is busy. Please wait a moment and try again.")
+
     raw = response.choices[0].message.content.strip()
+    raw = re.sub(r"^```[a-z]*\n?", "", raw).rstrip("`").strip()
     match = re.search(r"\[.*\]", raw, re.DOTALL)
-    return json.loads(match.group()) if match else []
+    if not match:
+        raise ValueError(f"No JSON array in AI response: {raw[:300]}")
+    try:
+        return json.loads(match.group())
+    except json.JSONDecodeError as e:
+        raise ValueError(f"JSON parse failed: {e}")

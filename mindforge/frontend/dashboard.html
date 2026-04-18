@@ -43,80 +43,31 @@
     .dark .icon-btn { color: #94a3b8; }
     .dark .sidebar-bottom { border-color: #2a2a40; }
     .dark .flashcard-bg { background: #1e1e30; }
+
+    /* Learner Profiling Modal */
+    #profileModal { display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); align-items:center; justify-content:center; }
+    #profileModal.open { display:flex; }
+    .option-btn { transition: all 180ms ease; }
+    .option-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(108,92,231,0.12); }
+    .option-btn.selected { border-color: #6C5CE7; background: rgba(108,92,231,0.06); box-shadow: 0 8px 24px rgba(108,92,231,0.15); }
+    .option-btn.selected .tick { opacity: 1; transform: scale(1); }
+    .tick { opacity: 0; transform: scale(0.8); transition: all 180ms ease; }
+    .progress-bar { transition: width 420ms cubic-bezier(0.16,1,0.3,1); }
+    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; }
+    .screen-enter { animation: fadeSlideIn 0.35s ease forwards; }
+    @keyframes fadeSlideIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .check-path { stroke-dasharray:100; stroke-dashoffset:100; animation: drawCheck 0.8s ease forwards 0.25s; }
+    @keyframes drawCheck { 0%{stroke-dashoffset:100} 100%{stroke-dashoffset:0} }
+    .confetti-piece { position:absolute; top:0; width:10px; height:16px; border-radius:999px; animation: confettiFall 1.6s ease-out forwards; }
+    @keyframes confettiFall { 0%{opacity:1;transform:translateY(-10px) rotate(0deg)} 100%{opacity:0;transform:translateY(220px) rotate(540deg)} }
   </style>
 </head>
 <body class="min-h-screen flex">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar sidebar-bg bg-[#f8f9fc] h-screen fixed left-0 top-0 flex flex-col border-r border-gray-200 z-20">
-
-    <!-- TOP SECTION: Logo + Nav -->
-    <div class="flex-1 flex flex-col overflow-y-auto">
-      <!-- Logo -->
-      <div class="px-5 py-5 flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,#6C5CE7,#4A90E2)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <span class="text-xl font-extrabold tracking-tight text-gray-800">Mind<span style="color:#6C5CE7">Forge</span></span>
-      </div>
-
-      <!-- Nav Items -->
-      <nav class="px-3 space-y-0.5">
-        <a href="dashboard.html" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 transition cursor-pointer">
-          <i data-lucide="home" class="w-4 h-4"></i> Home
-        </a>
-        <a href="pages/notes.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 transition cursor-pointer">
-          <i data-lucide="library" class="w-4 h-4"></i> Your Library
-        </a>
-        <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 transition cursor-pointer">
-          <i data-lucide="bell" class="w-4 h-4"></i> Notifications
-        </a>
-        <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 transition cursor-pointer">
-          <i data-lucide="folder" class="w-4 h-4"></i> Folders
-        </a>
-        <a href="pages/flashcards.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 transition cursor-pointer">
-          <i data-lucide="layers" class="w-4 h-4"></i> Flashcards
-        </a>
-        <a href="pages/quiz.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 transition cursor-pointer">
-          <i data-lucide="clipboard-list" class="w-4 h-4"></i> Quiz
-        </a>
-      </nav>
-
-      <!-- MIDDLE SECTION: New Chat + Chats -->
-      <div class="px-4 mt-6 space-y-3">
-        <button id="newChatBtn" class="gradient-btn w-full py-2.5 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md hover:opacity-90 transition">
-          <i data-lucide="plus" class="w-4 h-4"></i> New Chat
-        </button>
-
-        <button class="w-full flex items-center justify-between px-3 py-2 text-sm font-semibold text-gray-600 hover:bg-purple-50 rounded-lg transition">
-          <span>Chats</span>
-          <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i>
-        </button>
-        <div class="space-y-1" id="chatHistoryList"></div>
-      </div>
-    </div>
-
-    <!-- BOTTOM SECTION: Terms + Logout + User Profile -->
-    <div class="mt-auto sidebar-bottom border-t border-gray-200 px-4 py-4 space-y-1">
-      <a href="#" class="nav-item flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 transition cursor-pointer">
-        <i data-lucide="file-text" class="w-4 h-4"></i> Terms
-      </a>
-      <a href="#" onclick="logout()" class="nav-item flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 transition cursor-pointer">
-        <i data-lucide="log-out" class="w-4 h-4"></i> Logout
-      </a>
-      <!-- User Profile -->
-      <div class="flex items-center gap-3 pt-4 mt-2 border-t border-gray-200">
-        <div class="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0" style="background:linear-gradient(135deg,#6C5CE7,#4A90E2)" id="sidebar-avatar">M</div>
-        <div class="overflow-hidden">
-          <p class="text-sm font-semibold text-gray-800 truncate" id="sidebar-name">User</p>
-          <p class="text-xs text-gray-400" id="sidebar-role">Student</p>
-        </div>
-      </div>
-    </div>
-  </aside>
+  <div id="app-sidebar"></div>
 
   <!-- RIGHT SIDE -->
-  <div class="main-area ml-[240px] flex flex-col min-h-screen">
+  <div id="main" class="main-area flex flex-col min-h-screen">
 
     <!-- TOP NAVBAR -->
     <header class="navbar-bg bg-white border-b border-gray-200 px-6 py-3 flex items-center gap-4 sticky top-0 z-10">
@@ -184,7 +135,7 @@
 
         <!-- Chat Messages -->
         <div id="chatContainer" class="chat-scroll px-5 py-4 bg-gray-50/50">
-          <div class="max-w-[900px] mx-auto space-y-3">
+          <div class="msg-wrapper max-w-[900px] mx-auto space-y-3">
             <div class="flex items-start gap-2.5 msg-animate">
               <div class="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center" style="background:linear-gradient(135deg,#6C5CE7,#4A90E2)">
                 <i data-lucide="bot" class="w-4 h-4 text-white"></i>
@@ -268,7 +219,29 @@
     </main>
   </div>
 
+  <!-- Learner Profiling Modal -->
+  <div id="profileModal">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden relative" style="max-height:90vh;overflow-y:auto">
+      <!-- Modal Header -->
+      <div class="px-6 pt-6 pb-4 border-b border-gray-100">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-semibold text-gray-400" id="m-stepText">Step 1 of 7</span>
+          <span class="text-xs font-semibold border border-gray-200 bg-gray-50 rounded-full px-3 py-0.5 text-gray-500" id="m-progressText">14%</span>
+        </div>
+        <div class="bg-gray-100 rounded-full h-2 overflow-hidden">
+          <div id="m-progressBar" class="h-2 rounded-full progress-bar" style="width:14%;background:linear-gradient(90deg,#6C5CE7,#4A90E2)"></div>
+        </div>
+      </div>
+      <!-- Modal Body -->
+      <div class="px-6 py-6 relative">
+        <div id="m-confetti" class="pointer-events-none absolute inset-0 overflow-hidden"></div>
+        <div id="m-screen" class="screen-enter"></div>
+      </div>
+    </div>
+  </div>
+
   <script src="assets/js/chatbot.js" defer></script>
+  <script src="assets/js/sidebar.js"></script>
   <script>
     // Auth guard
     const token = localStorage.getItem("mf_token");
@@ -279,17 +252,6 @@
     const user = JSON.parse(localStorage.getItem("mf_user") || "null");
     const initial = user ? user.name.charAt(0).toUpperCase() : "M";
     document.getElementById("user-avatar").textContent = initial;
-    document.getElementById("sidebar-avatar").textContent = initial;
-    if (user) {
-      document.getElementById("sidebar-name").textContent = user.name;
-      document.getElementById("sidebar-role").textContent = user.role || "Student";
-    }
-
-    function logout() {
-      localStorage.removeItem("mf_token");
-      localStorage.removeItem("mf_user");
-      window.location.href = "login.html";
-    }
 
     // Dark mode toggle
     function toggleDark() {
@@ -299,6 +261,165 @@
       icon.setAttribute("data-lucide", isDark ? "sun" : "moon");
       lucide.createIcons();
     }
+
+    // ── Learner Profiling Wizard ──────────────────────────────────────────
+    const API_BASE = "http://127.0.0.1:5000/api";
+
+    // Check if profile exists; show modal if not
+    fetch(`${API_BASE}/learner-profiling`, { headers: { "Authorization": `Bearer ${token}` } })
+      .then(r => { if (!r.ok) openProfileModal(); })
+      .catch(() => {});
+
+    function openProfileModal() {
+      document.getElementById('profileModal').classList.add('open');
+      pRender();
+    }
+
+    const pQuestions = [
+      { type:'text',    key:'name',       title:'Before we begin, what should we call you?',                          subtitle:'So the experience feels personal and less robotic.',             placeholder:'Enter your name' },
+      { type:'options', key:'subject',    title: n=>`Great, ${n}. What do you want to learn right now?`,             subtitle:'Choose the area you want MindForge to tune for first.',          options:['Programming','Mathematics','Science','Exam Preparation','Other'] },
+      { type:'options', key:'level',      title:'How would you rate your current level?',                             subtitle:'This helps us set the right pace from day one.',                 options:['Beginner','Intermediate','Advanced'] },
+      { type:'options', key:'duration',   title:'How long do you prefer learning at a time?',                         subtitle:"We'll shape lessons around your ideal attention window.",          options:['2–3 min','5–7 min','10+ min'] },
+      { type:'options', key:'style',      title:'How do you prefer to learn?',                                        subtitle:'Pick the style that feels most natural to you.',                  options:['Simple explanations','Step-by-step examples','Practice questions','Visual / real-life examples'] },
+      { type:'options', key:'difficulty', title:'When learning something new, what do you prefer?',                  subtitle:'We can keep it gentle, balanced, or stretch your thinking.',      options:['Start easy','Moderate difficulty','Challenge me'] },
+      { type:'options', key:'confidence', title:'How confident are you in this subject?',                             subtitle:'Your confidence helps us calibrate encouragement and review.',     options:['Not confident','Somewhat confident','Very confident'] }
+    ];
+
+    const pState = { step:0, answers:{ name:'',subject:'',level:'',duration:'',style:'',difficulty:'',confidence:'' }, completed:false };
+    const mScreen = () => document.getElementById('m-screen');
+    const mBar    = () => document.getElementById('m-progressBar');
+    const mPct    = () => document.getElementById('m-progressText');
+    const mStep   = () => document.getElementById('m-stepText');
+
+    function pPct() { return pState.completed ? 100 : Math.round(((pState.step+1)/pQuestions.length)*100); }
+    function pValid() { const v=pState.answers[pQuestions[pState.step].key]; return typeof v==='string'?v.trim().length>0:Boolean(v); }
+    function pEsc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+
+    function pRender() {
+      const p = pPct();
+      mBar().style.width = `${p}%`;
+      mPct().textContent = `${p}%`;
+      if (pState.completed) { mStep().textContent='Profile ready'; pRenderSuccess(); return; }
+      const q = pQuestions[pState.step];
+      mStep().textContent = `Step ${pState.step+1} of ${pQuestions.length}`;
+      q.type==='text' ? pRenderText(q) : pRenderOptions(q);
+    }
+
+    function pRenderText(q) {
+      const val = pState.answers[q.key];
+      const s = mScreen(); s.className='screen-enter';
+      s.innerHTML = `
+        <div class="space-y-5">
+          <div>
+            <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-widest mb-3" style="background:#ede9fe;color:#6C5CE7">Learner onboarding</span>
+            <h2 class="text-xl font-bold text-gray-800 mb-1">${pEsc(q.title)}</h2>
+            <p class="text-sm text-gray-500">${pEsc(q.subtitle)}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Your name</label>
+            <input id="p-nameInput" type="text" value="${pEsc(val)}" placeholder="${pEsc(q.placeholder)}"
+              class="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm text-gray-800 outline-none placeholder:text-gray-400 focus:border-violet-400 focus:bg-white transition" />
+          </div>
+          <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+            <button class="min-h-[40px] rounded-xl border border-gray-200 px-5 py-2 text-sm font-semibold text-gray-400 cursor-not-allowed" disabled>Back</button>
+            <button id="p-nextBtn" ${val.trim()?'':'disabled'} class="btn-primary min-h-[40px] rounded-xl px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5" style="background:linear-gradient(135deg,#6C5CE7,#4A90E2)">Continue</button>
+          </div>
+        </div>`;
+      const inp = document.getElementById('p-nameInput');
+      const btn = document.getElementById('p-nextBtn');
+      inp.addEventListener('input', e => { pState.answers.name=e.target.value; btn.disabled=!pState.answers.name.trim(); });
+      inp.addEventListener('keydown', e => { if(e.key==='Enter'&&pState.answers.name.trim()) pNext(); });
+      btn.addEventListener('click', pNext);
+    }
+
+    function pRenderOptions(q) {
+      const selected = pState.answers[q.key];
+      const title = typeof q.title==='function' ? q.title(pState.answers.name.trim()||'there') : q.title;
+      const finalStep = pState.step===pQuestions.length-1;
+      const s = mScreen(); s.className='screen-enter';
+      s.innerHTML = `
+        <div class="space-y-5">
+          <div>
+            <h2 class="text-xl font-bold text-gray-800 mb-1">${title}</h2>
+            <p class="text-sm text-gray-500">${q.subtitle}</p>
+          </div>
+          <div class="grid gap-2.5 ${q.options.length>3?'grid-cols-2':''}">
+            ${q.options.map(o=>`
+              <button type="button" data-option="${pEsc(o)}"
+                class="option-btn flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-3 text-left ${selected===o?'selected':''}">
+                <span class="text-sm font-semibold text-gray-800">${pEsc(o)}</span>
+                <span class="tick flex h-6 w-6 items-center justify-center rounded-full text-white flex-shrink-0" style="background:linear-gradient(135deg,#6C5CE7,#4A90E2)">
+                  <svg viewBox="0 0 20 20" class="h-3 w-3" fill="none"><path d="M4.5 10.5 8 14l7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </button>`).join('')}
+          </div>
+          <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+            <button data-back class="min-h-[40px] rounded-xl border border-gray-200 px-5 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50">Back</button>
+            <button data-primary ${selected?'':'disabled'} class="btn-primary min-h-[40px] rounded-xl px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5" style="background:linear-gradient(135deg,#6C5CE7,#4A90E2)">
+              ${finalStep?'Create My Profile':'Continue'}
+            </button>
+          </div>
+        </div>`;
+      s.querySelectorAll('[data-option]').forEach(b => b.addEventListener('click', ()=>{ pState.answers[q.key]=b.dataset.option; pRender(); }));
+      s.querySelector('[data-back]').addEventListener('click', ()=>{ if(pState.step>0){ pState.step--; pRender(); } });
+      s.querySelector('[data-primary]').addEventListener('click', pNext);
+    }
+
+    function pRenderSuccess() {
+      const name = pState.answers.name.trim() || 'Learner';
+      const s = mScreen(); s.className='screen-enter';
+      s.innerHTML = `
+        <div class="flex flex-col items-center justify-center gap-5 py-4 text-center">
+          <div class="relative flex h-16 w-16 items-center justify-center rounded-full" style="background:#f0fdf4;box-shadow:0 0 0 10px rgba(22,163,74,0.08)">
+            <svg viewBox="0 0 64 64" class="h-12 w-12" fill="none">
+              <circle cx="32" cy="32" r="24" stroke="#16a34a" stroke-width="4" opacity="0.18"/>
+              <path class="check-path" d="M20 33.5 28.5 42 45 24.5" stroke="#16a34a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="space-y-1">
+            <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-widest" style="background:#ede9fe;color:#6C5CE7">Profile complete</span>
+            <h2 class="text-xl font-bold text-gray-800">You're ready, ${pEsc(name)}!</h2>
+            <p class="text-sm text-gray-500">MindForge is now tuned for you.</p>
+          </div>
+          <button id="p-closeBtn" class="min-h-[42px] rounded-xl px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5" style="background:linear-gradient(135deg,#6C5CE7,#4A90E2)">Start Learning</button>
+        </div>`;
+      document.getElementById('p-closeBtn').addEventListener('click', () => {
+        document.getElementById('profileModal').classList.remove('open');
+      });
+      pLaunchConfetti();
+    }
+
+    async function pNext() {
+      if (!pValid()) return;
+      if (pState.step < pQuestions.length-1) { pState.step++; pRender(); }
+      else { await pSave(); pState.completed=true; pRender(); }
+    }
+
+    async function pSave() {
+      try {
+        await fetch(`${API_BASE}/learner-profiling`, {
+          method:"POST",
+          headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`},
+          body: JSON.stringify(pState.answers)
+        });
+      } catch(e) { console.error(e); }
+    }
+
+    function pLaunchConfetti() {
+      const layer = document.getElementById('m-confetti');
+      layer.innerHTML='';
+      const colors=['#6C5CE7','#4A90E2','#00B894','#a78bfa','#60a5fa'];
+      for(let i=0;i<24;i++){
+        const p=document.createElement('span'); p.className='confetti-piece';
+        p.style.left=`${Math.random()*100}%`;
+        p.style.background=colors[i%colors.length];
+        p.style.transform=`translateY(-12px) rotate(${Math.random()*180}deg)`;
+        p.style.animationDelay=`${Math.random()*0.25}s`;
+        layer.appendChild(p);
+      }
+      setTimeout(()=>{ layer.innerHTML=''; }, 1900);
+    }
+    // ── End Learner Profiling Wizard ─────────────────────────────────────────
 
     // Sidebar active nav
     document.querySelectorAll(".nav-item").forEach(item => {

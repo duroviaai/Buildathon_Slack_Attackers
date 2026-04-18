@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
       Hi! I'm MindForge AI. Ask me anything.
     </div>
   </div>`;
-  const DEFAULT_MSG = `<div class="max-w-[900px] mx-auto space-y-3">${DEFAULT_INNER}</div>`;
+  const DEFAULT_MSG = `<div class="msg-wrapper max-w-[900px] mx-auto space-y-3">${DEFAULT_INNER}</div>`;
 
   // ── Chat persistence ──────────────────────────────────────────────────────
   const STORAGE_KEY = "mf_chats";
@@ -77,11 +77,10 @@ document.addEventListener("DOMContentLoaded", () => {
     currentChatId = id;
     const chat = getCurrentChat();
     if (!chat) return;
-    const wrapper = getMsgWrapper();
-    wrapper.innerHTML = DEFAULT_INNER;
+    chatContainer.innerHTML = `<div class="msg-wrapper max-w-[900px] mx-auto space-y-3">${DEFAULT_INNER}</div>`;
     chat.messages.forEach(m => {
-      if (m.role === "user") wrapper.insertAdjacentHTML("beforeend", m.filePreview ? fileBubble(m.text, m.filePreview, m.fileName) : userBubble(m.text));
-      else wrapper.insertAdjacentHTML("beforeend", aiBubble(m.text));
+      if (m.role === "user") getMsgWrapper().insertAdjacentHTML("beforeend", m.filePreview ? fileBubble(m.text, m.filePreview, m.fileName) : userBubble(m.text));
+      else getMsgWrapper().insertAdjacentHTML("beforeend", aiBubble(m.text));
     });
     scrollBottom();
     renderSidebar();
@@ -92,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
     saveAllChats(chats);
     if (currentChatId === id) {
       if (chats.length) { currentChatId = chats[0].id; switchChat(currentChatId); }
-      else { createNewChat(); chatContainer.innerHTML = DEFAULT_MSG; }
+      else { createNewChat(); chatContainer.innerHTML = `<div class="msg-wrapper max-w-[900px] mx-auto space-y-3">${DEFAULT_INNER}</div>`; }
     }
     renderSidebar();
   }
@@ -103,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
   else createNewChat();
 
   // ── DOM helpers ───────────────────────────────────────────────────────────
-  function getMsgWrapper() { return chatContainer.querySelector("div"); }
+  function getMsgWrapper() { return chatContainer.querySelector(".msg-wrapper"); }
   function scrollBottom() { chatContainer.scrollTop = chatContainer.scrollHeight; }
   function escHtml(str) { return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 

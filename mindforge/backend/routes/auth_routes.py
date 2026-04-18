@@ -10,7 +10,7 @@ auth_bp = Blueprint("auth", __name__)
 
 GOOGLE_CLIENT_ID     = os.environ.get("GOOGLE_CLIENT_ID", "554482016091-elsto1gd07q56t9ni97ho43rgjvvmh59.apps.googleusercontent.com")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
-GOOGLE_REDIRECT_URI  = "http://127.0.0.1:5000/api/auth/google/callback"
+GOOGLE_REDIRECT_URI  = os.environ.get("GOOGLE_REDIRECT_URI", "http://127.0.0.1:5000/api/auth/google/callback")
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
@@ -106,7 +106,7 @@ def _popup_result(token, user, error):
         import json
         payload = json.dumps({"token": token, "user": user})
     html = f"""<!DOCTYPE html><html><body><script>
-  window.opener && window.opener.postMessage({payload}, 'http://127.0.0.1:5000');
+  window.opener && window.opener.postMessage({payload}, '*');
   window.close();
 </script></body></html>"""
     from flask import make_response

@@ -100,64 +100,10 @@
 </head>
 <body class="min-h-screen flex">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar sidebar-bg bg-[#f8f9fc] h-screen fixed left-0 top-0 flex flex-col border-r border-gray-200 z-20">
-    <div class="flex-1 flex flex-col overflow-y-auto">
-      <!-- Logo -->
-      <div class="px-5 py-5 flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,#6C5CE7,#4A90E2)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <span class="text-xl font-extrabold tracking-tight text-gray-800">Mind<span style="color:#6C5CE7">Forge</span></span>
-      </div>
-      <!-- Nav -->
-      <nav class="px-3 space-y-0.5">
-        <a href="../dashboard.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 transition cursor-pointer">
-          <i data-lucide="home" class="w-4 h-4"></i> Home
-        </a>
-        <a href="notes.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 transition cursor-pointer">
-          <i data-lucide="library" class="w-4 h-4"></i> Your Library
-        </a>
-        <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 transition cursor-pointer">
-          <i data-lucide="bell" class="w-4 h-4"></i> Notifications
-        </a>
-        <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 transition cursor-pointer">
-          <i data-lucide="folder" class="w-4 h-4"></i> Folders
-        </a>
-        <a href="flashcards.html" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 transition cursor-pointer">
-          <i data-lucide="layers" class="w-4 h-4"></i> Flashcards
-        </a>
-        <a href="quiz.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 transition cursor-pointer">
-          <i data-lucide="clipboard-list" class="w-4 h-4"></i> Quiz
-        </a>
-      </nav>
-      <!-- New Chat -->
-      <div class="px-4 mt-6 space-y-3">
-        <button class="gradient-btn w-full py-2.5 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md hover:opacity-90 transition">
-          <i data-lucide="plus" class="w-4 h-4"></i> New Chat
-        </button>
-      </div>
-    </div>
-    <!-- Bottom -->
-    <div class="mt-auto sidebar-bottom border-t border-gray-200 px-4 py-4 space-y-1">
-      <a href="#" class="nav-item flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 transition cursor-pointer">
-        <i data-lucide="file-text" class="w-4 h-4"></i> Terms
-      </a>
-      <a href="#" onclick="logout()" class="nav-item flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 transition cursor-pointer">
-        <i data-lucide="log-out" class="w-4 h-4"></i> Logout
-      </a>
-      <div class="flex items-center gap-3 pt-4 mt-2 border-t border-gray-200">
-        <div id="sidebar-avatar" class="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0" style="background:linear-gradient(135deg,#6C5CE7,#4A90E2)">M</div>
-        <div class="overflow-hidden">
-          <p id="sidebar-name" class="text-sm font-semibold text-gray-800 truncate text-main">User</p>
-          <p id="sidebar-role" class="text-xs text-gray-400">Student</p>
-        </div>
-      </div>
-    </div>
-  </aside>
+  <div id="app-sidebar"></div>
 
   <!-- MAIN -->
-  <div class="main-area ml-[240px] flex flex-col min-h-screen">
+  <div id="main" class="main-area flex flex-col min-h-screen">
 
     <!-- TOP NAVBAR -->
     <header class="navbar-bg bg-white border-b border-gray-200 px-6 py-3 flex items-center gap-4 sticky top-0 z-10">
@@ -250,6 +196,7 @@
   </div>
 
   <script src="../assets/js/flashcard.js"></script>
+  <script src="../assets/js/sidebar.js"></script>
   <script>
     lucide.createIcons();
 
@@ -259,17 +206,6 @@
     const user = JSON.parse(localStorage.getItem("mf_user") || "null");
     const initial = user ? user.name.charAt(0).toUpperCase() : "M";
     document.getElementById("user-avatar").textContent = initial;
-    document.getElementById("sidebar-avatar").textContent = initial;
-    if (user) {
-      document.getElementById("sidebar-name").textContent = user.name;
-      document.getElementById("sidebar-role").textContent = user.role || "Student";
-    }
-
-    function logout() {
-      localStorage.removeItem("mf_token");
-      localStorage.removeItem("mf_user");
-      window.location.href = "../login.html";
-    }
 
     function toggleDark() {
       document.documentElement.classList.toggle("dark");

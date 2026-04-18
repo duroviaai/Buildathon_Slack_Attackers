@@ -122,7 +122,7 @@ async function handleOtpSubmit(e) {
 
   localStorage.setItem("mf_token", loginData.token);
   localStorage.setItem("mf_user", JSON.stringify(loginData.user));
-  window.location.href = "/dashboard.html";
+  window.location.href = "/pages/learner-profiling.html";
 }
 
 // ─── Login ────────────────────────────────────────────────────────────────────
@@ -147,7 +147,9 @@ async function handleLogin(e) {
   localStorage.setItem("mf_user",  JSON.stringify(data.user));
 
   animateAvatarToCorner(data.user.name);
-  setTimeout(() => { window.location.href = "/dashboard.html"; }, 1200);
+  const profileRes = await apiFetch("/learner-profiling");
+  const dest = profileRes.data ? "/dashboard.html" : "/pages/learner-profiling.html";
+  setTimeout(() => { window.location.href = dest; }, 1200);
 }
 
 // ─── Forgot Password: send OTP ────────────────────────────────────────────────

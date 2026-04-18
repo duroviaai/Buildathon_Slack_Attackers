@@ -322,13 +322,16 @@
         'https://accounts.google.com/o/oauth2/v2/auth?' + params.toString(),
         'google-signup', 'width=500,height=600,left=200,top=100'
       );
-      window.addEventListener('message', function handler(e) {
+      window.addEventListener('message', async function handler(e) {
         if (e.origin !== 'http://127.0.0.1:5000') return;
         window.removeEventListener('message', handler);
         if (e.data.error) { alert(e.data.error); return; }
         localStorage.setItem('mf_token', e.data.token);
         localStorage.setItem('mf_user', JSON.stringify(e.data.user));
-        window.location.href = 'pages/learner-profiling.html';
+        const profileRes = await fetch('http://127.0.0.1:5000/api/learner-profiling', {
+          headers: { 'Authorization': 'Bearer ' + e.data.token }
+        });
+        window.location.href = profileRes.ok ? 'dashboard.html' : 'pages/learner-profiling.html';
       });
     }
 
